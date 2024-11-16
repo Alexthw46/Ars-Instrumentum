@@ -44,8 +44,16 @@ public class ArmariumStorage implements ITooltipProvider {
         return new ArmariumStorage(currentSlot, flavorText, !isHotbarSwitch, getArmariumSlots());
     }
 
+    static Map<Slots, ArmariumSlot> emptyMap() {
+        Map<Slots, ArmariumSlot> map = new HashMap<>();
+        for (Slots slot : Slots.values()) {
+            map.put(slot, new ArmariumSlot());
+        }
+        return ImmutableMap.copyOf(map);
+    }
+
     public ArmariumStorage() {
-        this(Slots.getSlotForInt(0), "", false, new ArmariumSlotMap(ImmutableMap.of()));
+        this(Slots.getSlotForInt(0), "", false, new ArmariumSlotMap(emptyMap()));
     }
     public ArmariumStorage(Integer currentSlot, String flavorText, Boolean isHotbarSwitch, ArmariumSlotMap slotMap) {
         this(Slots.getSlotForInt(currentSlot), flavorText, isHotbarSwitch, slotMap);
@@ -86,10 +94,10 @@ public class ArmariumStorage implements ITooltipProvider {
         }
     }
 
-    public ArmariumSlot storeAndGet(List<ItemStack> itemStacks, List<ItemStack> itemStacks1, List<ItemStack> spellfoci, ResourceLocation familiarId, Object o) {
+    public ArmariumSlot storeAndGet(List<ItemStack> itemStacks, List<ItemStack> itemStacks1, List<ItemStack> spellfoci, ResourceLocation familiarId, Slots slot) {
         // get current ArmariumSlot, create the new one, and store it in the map
-        ArmariumSlot armariumSlot = armariumSlots.get(currentSlot);
-        armariumSlots.put(currentSlot, new ArmariumSlot(itemStacks, itemStacks1, spellfoci, familiarId));
+        ArmariumSlot armariumSlot = armariumSlots.get(slot);
+        armariumSlots.put(slot, new ArmariumSlot(itemStacks, itemStacks1, spellfoci, familiarId));
         return armariumSlot;
     }
 
