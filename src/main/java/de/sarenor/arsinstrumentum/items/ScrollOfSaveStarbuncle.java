@@ -33,74 +33,74 @@ public class ScrollOfSaveStarbuncle extends ModItem {
         super((new Properties()).stacksTo(1));
     }
 
-    public static void apply(ItemStack scroll, Starbuncle starbuncle, Player player) {
-        CompoundTag scrollTag = scroll.getOrCreateTag();
-        if (scrollTag.contains(SCROLL_OF_SAVE_TAG_ID)) {
-            CompoundTag configTag = scrollTag.getCompound(SCROLL_OF_SAVE_TAG_ID);
-            if (configTag.contains(DATA_TAG)) {
-                starbuncle.data = new Starbuncle.StarbuncleData(configTag.getCompound(DATA_TAG));
-            }
-            // consider cherry-picking the data we want to restore
-            starbuncle.restoreFromTag();
-            if (player != null) {
-                PortUtil.sendMessage(player, Component.literal(APPLIED_CONFIGURATION));
-            }
-        }
-    }
-
-    @Override
-    public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack doNotUseStack, Player playerEntity, @NotNull LivingEntity target, @NotNull InteractionHand hand) {
-        if (playerEntity.level().isClientSide || hand != InteractionHand.MAIN_HAND) {
-            return InteractionResult.PASS;
-        }
-
-        ItemStack heldScroll = playerEntity.getItemInHand(hand);
-        if (target instanceof Starbuncle starbuncle) {
-            if (playerEntity.isShiftKeyDown()) {
-                apply(heldScroll, starbuncle, playerEntity);
-            } else {
-                store(heldScroll, starbuncle, playerEntity);
-            }
-        }
-
-        return InteractionResult.SUCCESS;
-    }
-
-    @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player playerEntity, @NotNull InteractionHand hand) {
-        if (playerEntity.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
-            clear(playerEntity.getItemInHand(hand), playerEntity);
-        }
-        return InteractionResultHolder.pass(playerEntity.getItemInHand(hand));
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag p_77624_4_) {
-        CompoundTag scrollTag = stack.getOrCreateTag();
-        if (scrollTag.contains(SCROLL_OF_SAVE_TAG_ID)) {
-            tooltip.add(Component.literal(scrollTag.getCompound(SCROLL_OF_SAVE_TAG_ID).getString(TOOLTIP)));
-        }
-    }
-
-    private void store(ItemStack scroll, Starbuncle starbuncle, Player player) {
-        CompoundTag scrollTag = scroll.getOrCreateTag();
-        CompoundTag configTag = new CompoundTag();
-        Starbuncle.StarbuncleData data = starbuncle.data;
-        CompoundTag starbyBehavior = data.toTag(starbuncle, new CompoundTag());
-        //don't save cosmetic data
-        starbyBehavior.remove("cosmetic");
-        configTag.put(DATA_TAG, starbyBehavior);
-        scrollTag.put(SCROLL_OF_SAVE_TAG_ID, configTag);
-        scroll.setTag(scrollTag);
-        PortUtil.sendMessage(player, Component.literal(SAVED_CONFIGURATION));
-    }
-
-    private void clear(ItemStack scroll, Player player) {
-        CompoundTag scrollTag = scroll.getOrCreateTag();
-        scrollTag.remove(SCROLL_OF_SAVE_TAG_ID);
-        scroll.setTag(scrollTag);
-        PortUtil.sendMessage(player, Component.literal(CLEARED_CONFIGURATION));
-    }
-
-
+//    public static void apply(ItemStack scroll, Starbuncle starbuncle, Player player) {
+//        CompoundTag scrollTag = scroll.getOrCreateTag();
+//        if (scrollTag.contains(SCROLL_OF_SAVE_TAG_ID)) {
+//            CompoundTag configTag = scrollTag.getCompound(SCROLL_OF_SAVE_TAG_ID);
+//            if (configTag.contains(DATA_TAG)) {
+//                starbuncle.data = new Starbuncle.StarbuncleData(configTag.getCompound(DATA_TAG));
+//            }
+//            // consider cherry-picking the data we want to restore
+//            starbuncle.restoreFromTag();
+//            if (player != null) {
+//                PortUtil.sendMessage(player, Component.literal(APPLIED_CONFIGURATION));
+//            }
+//        }
+//    }
+//
+//    @Override
+//    public @NotNull InteractionResult interactLivingEntity(@NotNull ItemStack doNotUseStack, Player playerEntity, @NotNull LivingEntity target, @NotNull InteractionHand hand) {
+//        if (playerEntity.level().isClientSide || hand != InteractionHand.MAIN_HAND) {
+//            return InteractionResult.PASS;
+//        }
+//
+//        ItemStack heldScroll = playerEntity.getItemInHand(hand);
+//        if (target instanceof Starbuncle starbuncle) {
+//            if (playerEntity.isShiftKeyDown()) {
+//                apply(heldScroll, starbuncle, playerEntity);
+//            } else {
+//                store(heldScroll, starbuncle, playerEntity);
+//            }
+//        }
+//
+//        return InteractionResult.SUCCESS;
+//    }
+//
+//    @Override
+//    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player playerEntity, @NotNull InteractionHand hand) {
+//        if (playerEntity.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
+//            clear(playerEntity.getItemInHand(hand), playerEntity);
+//        }
+//        return InteractionResultHolder.pass(playerEntity.getItemInHand(hand));
+//    }
+//
+//    @Override
+//    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag p_77624_4_) {
+//        CompoundTag scrollTag = stack.getOrCreateTag();
+//        if (scrollTag.contains(SCROLL_OF_SAVE_TAG_ID)) {
+//            tooltip.add(Component.literal(scrollTag.getCompound(SCROLL_OF_SAVE_TAG_ID).getString(TOOLTIP)));
+//        }
+//    }
+//
+//    private void store(ItemStack scroll, Starbuncle starbuncle, Player player) {
+//        CompoundTag scrollTag = scroll.getOrCreateTag();
+//        CompoundTag configTag = new CompoundTag();
+//        Starbuncle.StarbuncleData data = starbuncle.data;
+//        CompoundTag starbyBehavior = data.toTag(starbuncle, new CompoundTag());
+//        //don't save cosmetic data
+//        starbyBehavior.remove("cosmetic");
+//        configTag.put(DATA_TAG, starbyBehavior);
+//        scrollTag.put(SCROLL_OF_SAVE_TAG_ID, configTag);
+//        scroll.setTag(scrollTag);
+//        PortUtil.sendMessage(player, Component.literal(SAVED_CONFIGURATION));
+//    }
+//
+//    private void clear(ItemStack scroll, Player player) {
+//        CompoundTag scrollTag = scroll.getOrCreateTag();
+//        scrollTag.remove(SCROLL_OF_SAVE_TAG_ID);
+//        scroll.setTag(scrollTag);
+//        PortUtil.sendMessage(player, Component.literal(CLEARED_CONFIGURATION));
+//    }
+//
+//
 }

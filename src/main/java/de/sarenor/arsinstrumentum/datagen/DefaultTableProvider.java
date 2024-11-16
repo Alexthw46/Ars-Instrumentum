@@ -1,6 +1,7 @@
 package de.sarenor.arsinstrumentum.datagen;
 
 import de.sarenor.arsinstrumentum.setup.Registration;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
@@ -11,17 +12,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+import static de.sarenor.arsinstrumentum.datagen.DataGenConfig.provider;
+
 public class DefaultTableProvider extends LootTableProvider {
     public DefaultTableProvider(DataGenerator dataGeneratorIn) {
-        super(dataGeneratorIn.getPackOutput(), new HashSet<>(), List.of(new LootTableProvider.SubProviderEntry(BlockLootTable::new, LootContextParamSets.BLOCK)));
+        super(dataGeneratorIn.getPackOutput(), new HashSet<>(), List.of(new SubProviderEntry(BlockLootTable::new, LootContextParamSets.BLOCK)), provider);
     }
-
-
     public static class BlockLootTable extends BlockLootSubProvider {
         public List<Block> list = new ArrayList<>();
 
-        protected BlockLootTable() {
-            super(Set.of(), FeatureFlags.REGISTRY.allFlags(), new HashMap<>());
+        protected BlockLootTable(HolderLookup.Provider provider) {
+            super(Set.of(), FeatureFlags.REGISTRY.allFlags(), provider);
         }
 
         @Override

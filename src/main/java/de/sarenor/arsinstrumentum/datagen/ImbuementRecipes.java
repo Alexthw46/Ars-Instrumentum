@@ -9,7 +9,8 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.Tags;
+import net.neoforged.neoforge.common.Tags;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 
@@ -25,17 +26,9 @@ public class ImbuementRecipes extends ImbuementRecipeProvider {
     @Override
     public void collectJsons(CachedOutput cache) {
         this.recipes.add((new ImbuementRecipe("fake_wilden_tribute", Ingredient.of(Tags.Items.STORAGE_BLOCKS_DIAMOND), new ItemStack(Registration.FAKE_WILDEN_TRIBUTE.get()), 5000)).withPedestalItem(ItemsRegistry.ARCHMAGE_SPELLBOOK).withPedestalItem(Items.NETHER_STAR).withPedestalItem(Items.TOTEM_OF_UNDYING));
-
-        Path output = this.generator.getPackOutput().getOutputFolder();
-
-        for (ImbuementRecipe g : this.recipes) {
-            Path path = getRecipePath(output, g.getId().getPath());
-            saveStable(cache, g.asRecipe(), path);
-        }
-
     }
 
-    public String getName() {
+    public @NotNull String getName() {
         return "Instrumentum Imbuement Recipes";
     }
 }

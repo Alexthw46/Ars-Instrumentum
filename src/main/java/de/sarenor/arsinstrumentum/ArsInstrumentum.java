@@ -4,31 +4,34 @@ import com.hollingsworth.arsnouveau.setup.registry.CreativeTabRegistry;
 import de.sarenor.arsinstrumentum.network.Networking;
 import de.sarenor.arsinstrumentum.setup.ArsInstrumentumConfig;
 import de.sarenor.arsinstrumentum.setup.Registration;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(ArsInstrumentum.MODID)
 public class ArsInstrumentum {
     public static final String MODID = "ars_instrumentum";
-    public static ForgeConfigSpec SERVER_CONFIG;
+    public static ModConfigSpec SERVER_CONFIG;
 
-    public ArsInstrumentum() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ArsInstrumentumConfig.CLIENT_SPEC);
-        Registration.init(bus);
-        bus.addListener(this::setup);
-        bus.addListener(this::doClientStuff);
-        bus.addListener(this::doTabsStuff);
-        MinecraftForge.EVENT_BUS.register(this);
+    public ArsInstrumentum(IEventBus modEventBus, ModContainer modContainer) {
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ArsInstrumentumConfig.CLIENT_SPEC);
+        Registration.init(modEventBus);
+        modEventBus.addListener(this::setup);
+        modEventBus.addListener(this::doClientStuff);
+        modEventBus.addListener(this::doTabsStuff);
+        modEventBus.addListener(Networking::register);
+    }
+
+    public static ResourceLocation prefix(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
     private void doTabsStuff(BuildCreativeModeTabContentsEvent event) {
@@ -40,9 +43,9 @@ public class ArsInstrumentum {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        Networking.registerMessages();
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {
     }
+
 }
