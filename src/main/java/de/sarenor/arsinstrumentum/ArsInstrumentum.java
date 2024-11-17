@@ -1,6 +1,8 @@
 package de.sarenor.arsinstrumentum;
 
+import com.hollingsworth.arsnouveau.api.registry.SpellCasterRegistry;
 import com.hollingsworth.arsnouveau.setup.registry.CreativeTabRegistry;
+import com.hollingsworth.arsnouveau.setup.registry.DataComponentRegistry;
 import de.sarenor.arsinstrumentum.network.Networking;
 import de.sarenor.arsinstrumentum.setup.ArsInstrumentumConfig;
 import de.sarenor.arsinstrumentum.setup.Registration;
@@ -12,10 +14,10 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 // The value here should match an entry in the META-INF/mods.toml file
+
 @Mod(ArsInstrumentum.MODID)
 public class ArsInstrumentum {
     public static final String MODID = "ars_instrumentum";
@@ -43,6 +45,10 @@ public class ArsInstrumentum {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            SpellCasterRegistry.register(Registration.COPY_PASTE_SPELL_SCROLL.get(), (stack) -> stack.get(DataComponentRegistry.SPELL_CASTER.get()));
+        });
+
     }
 
     private void doClientStuff(final FMLClientSetupEvent event) {

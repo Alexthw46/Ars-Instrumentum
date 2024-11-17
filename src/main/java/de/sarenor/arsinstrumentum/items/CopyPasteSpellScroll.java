@@ -4,16 +4,22 @@ import com.hollingsworth.arsnouveau.api.item.ICasterTool;
 import com.hollingsworth.arsnouveau.api.registry.SpellCasterRegistry;
 import com.hollingsworth.arsnouveau.api.spell.AbstractCaster;
 import com.hollingsworth.arsnouveau.api.spell.Spell;
+import com.hollingsworth.arsnouveau.api.spell.SpellCaster;
+import com.hollingsworth.arsnouveau.client.gui.SpellTooltip;
 import com.hollingsworth.arsnouveau.common.items.ModItem;
 import com.hollingsworth.arsnouveau.common.items.SpellBook;
 import com.hollingsworth.arsnouveau.common.items.SpellParchment;
 import com.hollingsworth.arsnouveau.common.util.PortUtil;
+import com.hollingsworth.arsnouveau.setup.config.Config;
+import com.hollingsworth.arsnouveau.setup.registry.DataComponentRegistry;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -21,6 +27,7 @@ import net.minecraft.world.level.LevelReader;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CopyPasteSpellScroll extends ModItem implements ICasterTool {
 
@@ -28,7 +35,7 @@ public class CopyPasteSpellScroll extends ModItem implements ICasterTool {
     public static final String APPLIED_CONFIGURATION = "Applied Spell";
 
     public CopyPasteSpellScroll() {
-        super((new Properties()).stacksTo(1));
+        super((new Properties()).stacksTo(1).component(DataComponentRegistry.SPELL_CASTER.get(), new SpellCaster()));
     }
 
     @Override
@@ -42,9 +49,7 @@ public class CopyPasteSpellScroll extends ModItem implements ICasterTool {
                 if (copyPasteSpellcaster == null || offhandSpellcaster == null) {
                     return new InteractionResultHolder<>(InteractionResult.PASS, usedCopyPasteScroll);
                 }
-                offhandSpellcaster.setSpell(copyPasteSpellcaster.getSpell());
-                offhandSpellcaster.setColor(copyPasteSpellcaster.getColor());
-                offhandSpellcaster.setSpellName(copyPasteSpellcaster.getSpellName());
+                offhandSpellcaster.setSpell(copyPasteSpellcaster.getSpell()).setColor(copyPasteSpellcaster.getColor()).setSpellName(copyPasteSpellcaster.getSpellName()).saveToStack(offhand);
                 PortUtil.sendMessage(player, Component.literal(APPLIED_CONFIGURATION));
                 return new InteractionResultHolder<>(InteractionResult.SUCCESS, usedCopyPasteScroll);
             } else {
@@ -66,10 +71,7 @@ public class CopyPasteSpellScroll extends ModItem implements ICasterTool {
                 if (heldCaster == null) {
                     return false;
                 }
-                spell = heldCaster.getSpell();
-                thisCaster.setColor(heldCaster.getColor());
-                thisCaster.setFlavorText(heldCaster.getFlavorText());
-                thisCaster.setSpellName(heldCaster.getSpellName());
+                thisCaster.setSpell(heldCaster.getSpell()).setColor(heldCaster.getColor()).setFlavorText(heldCaster.getFlavorText()).setSpellName(heldCaster.getSpellName()).saveToStack(stack);
             }
 
             if (this.isScribedSpellValid(thisCaster, player, handIn, stack, spell)) {
@@ -95,12 +97,16 @@ public class CopyPasteSpellScroll extends ModItem implements ICasterTool {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext tooltipContext, @NotNull List<Component> tooltip2, @NotNull TooltipFlag flagIn) {
-        AbstractCaster<? extends AbstractCaster<?>> copyPasteSpellcaster = this.getSpellCaster(stack);
-        if (copyPasteSpellcaster != null) {
-            tooltip2.add(Component.literal("Inscribed Spell: " + copyPasteSpellcaster.getSpellName()));
-            tooltip2.add(Component.literal(copyPasteSpellcaster.getSpell().getDisplayString()));
-        }
-        super.appendHoverText(stack, tooltipContext, tooltip2, flagIn);
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltip2, @NotNull TooltipFlag flagIn) {
+        stack.addToTooltip(DataComponentRegistry.SPELL_CASTER, context, tooltip2::add, flagIn);
+        super.appendHoverText(stack, context, tooltip2, flagIn);
+    }
+
+    @Override
+    public @NotNull Optional<TooltipComponent> getTooltipImage(@NotNull ItemStack pStack) {
+        AbstractCaster<?> caster = getSpellCaster(pStack);
+        if (caster != null && Config.GLYPH_TOOLTIPS.get() && !Screen.hasShiftDown() && !caster.isSpellHidden() && !caster.getSpell().isEmpty())
+            return Optional.of(new SpellTooltip(caster));
+        return Optional.empty();
     }
 }
